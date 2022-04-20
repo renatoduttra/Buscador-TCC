@@ -1,5 +1,3 @@
-# 6 - Usar threadings para executar processos simultaneos
-
 #Reconhecimento de fala
 from speech_recognition import Microphone, Recognizer, AudioFile, UnknownValueError, RequestError, WaitTimeoutError
 import speech_recognition as sr
@@ -17,9 +15,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
+#Usar threadings para executar processos simultaneos
+import threading
 
-
-# 2 - Sintetizador de voz
+#Sintetizador de voz
 def Sintetizador(resposta):
     en = pyttsx3.init()
     en.setProperty('voice', b'brazil')
@@ -28,7 +27,7 @@ def Sintetizador(resposta):
     en.say(resposta)
     en.runAndWait()
 
-# 1 - Reconhecer voz
+#Reconhecer voz
 def Microfone():
     print('fale')
     recon = sr.Recognizer()
@@ -54,16 +53,25 @@ def Microfone():
             return "none"
         return resposta
 
-# 3 - Laço de repetição usando condicional do nome AV
+#Laço de repetição usando condicional do nome AV
 def Menu():
     i = " "
     while i != "sair":
+
         resposta = Microfone()
+        x = threading.Thread(target=Sintetizador(resposta))
+        y = threading.Thread(target=Sintetizador(resposta))
+        x.start()
+        y.start()
+        x.join()
+        y.join()
         # print("While> {} ".format(resposta))
         if resposta == "Nero":
             #print(">>>")
             resposta = "Póde Falaar!"
-            Sintetizador(resposta)
+            #Sintetizador(resposta)
+            x = threading.Thread(target=Sintetizador(resposta))
+            x.start()
             nome = Microfone()
             (titulos, link) = pesquisar(nome)
             Sintetizador("{} ".format(titulos[0]))
@@ -77,7 +85,7 @@ def Menu():
             break
         i = resposta
 
-# 4 -Função de busca
+#Função de busca
 def pesquisar(resposta):
     # resposta = "globo"
     resposta = resposta.replace(" ", "+")
@@ -111,7 +119,7 @@ def pesquisar(resposta):
     print("\n{}".format(site))
     return titulos, site
 
-# 5 - Definir navegador
+#Definir navegador
 def AbrirSite(link):
     try:
         print(link)
