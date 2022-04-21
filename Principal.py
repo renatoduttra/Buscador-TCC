@@ -32,9 +32,9 @@ def Microfone():
     print('fale')
     recon = sr.Recognizer()
     with sr.Microphone() as source:
-        recon.adjust_for_ambient_noise(source, duration=0.02)
+        recon.adjust_for_ambient_noise(source, duration=0.1)
         recon.pause_threshold = 1
-        audio = recon.listen(source, timeout=7, phrase_time_limit=7)
+        audio = recon.listen(source)
         # resposta = recon.recognize_google(audio, language='pt')
         # resposta = resposta.replace(" ", "+")
         # resposta = unicodedata.normalize(u'NFKD', resposta).encode('ascii', 'ignore').decode('utf8')
@@ -42,29 +42,47 @@ def Microfone():
         try:
             resposta = recon.recognize_google(audio, language='pt')
             print(resposta)
-            # return resposta
+            if resposta == " ":
+                print("PROBLEMA NO IF!")
+                pass
+            else:
+                return resposta
         except WaitTimeoutError:
-            print("SEM AUDIO - 1")
-            Microfone()
-            return "none"
+            print("O TEMPO PASSOU E NÃO HOUVE CAPTURA DE AUDIO.")
+            #Microfone()
+            pass
         except Exception as e:
             #print("SEM AUDIO - 2")
             #Microfone()
-            return "none"
-        return resposta
+            return None
+        # return resposta
+
+"""         except UnboundLocalError as error:
+            pass
+        except WaitTimeoutError as e:
+            pass
+        except:
+            pass """
 
 #Laço de repetição usando condicional do nome AV
 def Menu():
     i = " "
+    contador = 0
     while i != "sair":
 
         resposta = Microfone()
-        x = threading.Thread(target=Sintetizador(resposta))
-        y = threading.Thread(target=Sintetizador(resposta))
-        x.start()
-        y.start()
-        x.join()
-        y.join()
+        #print(resposta)
+        if resposta == None:
+                print("{} AUDIO VAZIO!".format(contador))
+                contador+=1
+                pass
+        else:  
+                x = threading.Thread(target=Sintetizador(resposta))
+                #y = threading.Thread(target=Menu())
+                x.start()
+                #y.start()
+                #x.join()
+                #y.join()
         # print("While> {} ".format(resposta))
         if resposta == "Nero":
             #print(">>>")
